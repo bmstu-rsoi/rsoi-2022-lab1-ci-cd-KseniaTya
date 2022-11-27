@@ -1,0 +1,10 @@
+{% extends 'persons/base.html' %}
+
+{% block content %}
+
+        <form method="POST" action="">
+            {% csrf_token %}
+            <input type="submit" value="Удалить">
+        </form>
+
+{% endblock %}
