@@ -1,22 +1,7 @@
-#FROM openjdk:11-jdk as builder
-#WORKDIR application
-#ARG JAR_FILE=build/libs/person-service.jar
-#COPY ${JAR_FILE} application.jar
-#RUN java -Djarmode=layertools -jar application.jar extract
-#
-#FROM openjdk:11-jdk
-#ENV PORT=8080
-#WORKDIR application
-#COPY --from=builder application/spring-boot-loader/ ./
-#COPY --from=builder application/dependencies/ ./
-#COPY --from=builder application/snapshot-dependencies/ ./
-#COPY --from=builder application/application/ ./
-#ENTRYPOINT ["java", "-Dserver.port=${PORT}", "-Xmx512m", "-Xms512m", "org.springframework.boot.loader.JarLauncher"]
-
 FROM python:latest
 COPY . /app
 WORKDIR /app
-EXPOSE 8080
+EXPOSE 3000
 RUN pip install --no-cache-dir -r requirements.txt
 COPY . /app
-CMD python3 manage.py runserver 0.0.0.0:8080
+CMD python3 manage.py runserver 0.0.0.0:3000
