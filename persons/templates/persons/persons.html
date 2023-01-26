@@ -6,7 +6,7 @@
 
 {% for person in persons %}
 <p>
-    <a href="{% url 'person' person.id %}">{{ person.last_name }} {{ person.first_name }}</a>
+    <a href="{% url 'person' person.id %}">{{ person.last_name }} {{ person.name }}</a>
     {{ person.father_name }}
     {{ person.birthday }}
     <a href="{% url 'update_person' person.id %}">Изменить</a>

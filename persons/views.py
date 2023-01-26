@@ -1,11 +1,12 @@
 from django.shortcuts import render, redirect
+from django.http import JsonResponse
+
 from .models import Persons
 from .forms import CreateUpdatePerson
 
 def persons(request):
-    persons = Persons.objects.all()
-    context = {'persons': persons}
-    return render(request, 'persons/persons.html', context)
+    persons = Persons.objects.all().values()
+    return JsonResponse(list(persons), safe=False, status=200)
 
 
 def person(request, person_id):

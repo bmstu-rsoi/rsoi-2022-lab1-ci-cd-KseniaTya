@@ -7,7 +7,7 @@ class DateInput(forms.DateInput):
 class CreateUpdatePerson(forms.ModelForm):
     class Meta:
         model = Persons
-        fields = ['last_name', 'first_name', 'father_name', 'birthday',]         
+        fields = ['last_name', 'name', 'father_name', 'birthday',]         
         widgets = {
             'birthday': DateInput()
         }
