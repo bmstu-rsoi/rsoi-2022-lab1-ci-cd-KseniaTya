@@ -1,45 +1,39 @@
-from django.shortcuts import render, redirect
 from django.http import JsonResponse
-
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 from .models import Persons
-from .forms import CreateUpdatePerson
+from .serializers import PersonsSerializer
 
-def persons(request):
-    persons = Persons.objects.all().values()
-    return JsonResponse(list(persons), safe=False, status=200)
-
-
-def person(request, person_id):
-    person = Persons.objects.get(id=person_id)
-    context = {'person': person}
-    return render(request, 'persons/person.html', context)
-
-
-def create_person(request):
-    form = CreateUpdatePerson()
+@api_view(['GET','POST'])
+def persons_operations(request):
+    if request.method == 'GET':
+        persons=Persons.objects.all()
+        serializer=PersonsSerializer(persons,many=True)
+        return JsonResponse(serializer.data, safe=False, status=200)
     if request.method == 'POST':
-        form = CreateUpdatePerson(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('persons')
-    context = {'form': form}
-    return render(request, 'persons/create_person.html', context)
-
-
-def update_person(request, person_id):
-    person = Persons.objects.get(id=person_id)
-    form = CreateUpdatePerson(request.POST or None, instance=person)
-    if form.is_valid():
-        form.save()
-        return redirect('persons')
-    context = {'person': person, 'form': form}
-    return render(request, 'persons/update_person.html', context)
-
-
-def delete_person(request, person_id):
-    person = Persons.objects.get(id=person_id)
-    if request.POST:
+        serializer = PersonsSerializer(data=request.data)
+        if serializer.is_valid():
+            d = serializer.save()
+            response = Response(status=status.HTTP_201_CREATED)
+            response['Location'] = '/api/v1/persons/{personId}'.format(personId=d.id)
+            return response
+        return JsonResponse(serializer.data, safe=False, status=400)
+@api_view(['GET','PATCH','DELETE'])
+def person_id_operations(request, id):
+    try:
+        person = Persons.objects.get(id=id)
+    except Persons.DoesNotExist:
+        return Response(status=404)
+    if request.method == 'GET':
+        serializer = PersonsSerializer(person)
+        return Response(serializer.data, status=200)
+    if request.method == 'PATCH':
+        serializer = PersonsSerializer(person, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=200)
+        return Response(serializer.errors, status=400)
+    elif request.method == 'DELETE':
         person.delete()
-        return redirect('persons')
-    context = {'person': person}
-    return render(request, 'persons/delete_person.html', context)
+        return Response(status=204)

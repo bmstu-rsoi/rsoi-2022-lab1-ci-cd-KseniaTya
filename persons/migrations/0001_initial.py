@@ -18,10 +18,11 @@ class Migration(migrations.Migration):
             name='Persons',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('last_name', models.CharField(blank=True, max_length=200, verbose_name='Фамилия')),
                 ('name', models.CharField(blank=True, max_length=200, verbose_name='Имя')),
-                ('father_name', models.CharField(blank=True, max_length=200, verbose_name='Отчество')),
-                ('birthday', models.DateField(blank=True, verbose_name='День рождения')),
+                ('address', models.CharField(blank=True, max_length=200, verbose_name='Адрес')),
+                ('work', models.CharField(blank=True, max_length=200, verbose_name='Работа')),
+                ('age', models.IntegerField(verbose_name='Возраст')),
+
                 ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
         ),
