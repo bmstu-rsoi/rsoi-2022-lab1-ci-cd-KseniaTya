@@ -6,3 +6,5 @@ class Persons(models.Model):
     address = models.CharField('Адрес', max_length=200, blank=True)
     work = models.CharField('Работа', max_length=200, blank=True)
     age = models.DateField('Возраст',  max_length=200, blank=True)
+    def __str__(self):
+        return self.name
