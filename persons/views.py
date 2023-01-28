@@ -17,10 +17,8 @@ def persons_operations(request,format=None):
     if request.method=='POST':
         serializer=PersonsSerializer(data=request.data)
         if serializer.is_valid():
-            d=serializer.save()
-            response=Response(status=status.HTTP_201_CREATED)
-            response['Location']='/api/v1/persons/{personId}'.format(personId=d.id)
-            return response
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 @api_view(['GET','PATCH','DELETE'])
 def person_id_operations(request,id,format=None):
