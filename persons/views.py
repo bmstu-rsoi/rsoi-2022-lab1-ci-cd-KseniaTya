@@ -1,5 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
+from rest_framework.parsers import JSONParser
+
 from .models import Persons
 from .serializers import PersonsSerializer
 from django.http import JsonResponse,HttpResponse
@@ -15,10 +17,12 @@ def persons_operations(request,format=None):
         serializer=PersonsSerializer(persons,many=True)
         return Response(serializer.data,status=status.HTTP_200_OK)
     if request.method=='POST':
-        serializer=PersonsSerializer(data=request.data)
+        data = JSONParser().parse(request)
+        serializer = PersonsSerializer(data=data)
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            per = serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED,
+                            headers={"Location": "api/v1/persons/" + str(per.id)})
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 @api_view(['GET','PATCH','DELETE'])
 def person_id_operations(request,id,format=None):
