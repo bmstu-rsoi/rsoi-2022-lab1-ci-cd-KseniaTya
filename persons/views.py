@@ -1,42 +1,42 @@
-from django.http import JsonResponse
-from rest_framework import status
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
+from django.shortcuts import render
+from django.http import HttpResponse
 from .models import Persons
 from .serializers import PersonsSerializer
+from django.http import JsonResponse,HttpResponse
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+from django.template import loader
 
-
-@api_view(['GET', 'POST'])
-def persons_operations(request):
-    if request.method == 'GET':
-        persons = Persons.objects.all()
-        serializer = PersonsSerializer(persons, many=True)
-        return JsonResponse(serializer.data, safe=False, status=200)
-    if request.method == 'POST':
-        serializer = PersonsSerializer(data=request.data)
+@api_view(['GET','POST'])
+def persons_operations(request,format=None):
+    if request.method=='GET':
+        persons=Persons.objects.all()
+        serializer=PersonsSerializer(persons,many=True)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+    if request.method=='POST':
+        serializer=PersonsSerializer(data=request.data)
         if serializer.is_valid():
-            d = serializer.save()
-            response = Response(status=201)
-            response['Location'] = '/api/v1/persons/{personId}'.format(personId=d.id)
+            d=serializer.save()
+            response=Response(status=status.HTTP_201_CREATED)
+            response['Location']='/api/v1/persons/{personId}'.format(personId=d.id)
             return response
-        return JsonResponse(serializer.data, safe=False, status=400)
-
-
-@api_view(['GET', 'PATCH', 'DELETE'])
-def person_id_operations(request, id):
+        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+@api_view(['GET','PATCH','DELETE'])
+def person_id_operations(request,id,format=None):
     try:
-        person = Persons.objects.get(id=id)
+        person=Persons.objects.get(id=id)
     except Persons.DoesNotExist:
-        return Response(status=404)
-    if request.method == 'GET':
-        serializer = PersonsSerializer(person)
-        return Response(serializer.data, status=200)
-    if request.method == 'PATCH':
-        serializer = PersonsSerializer(person, data=request.data, partial=True)
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    if request.method=='GET':
+        serializer=PersonsSerializer(person)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+    if request.method=='PATCH':
+        serializer=PersonsSerializer(person,data=request.data,partial=True)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=200)
-        return Response(serializer.errors, status=400)
-    elif request.method == 'DELETE':
+            return Response(serializer.data,status=status.HTTP_200_OK)
+        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+    elif request.method=='DELETE':
         person.delete()
-        return Response(status=204)
+        return Response(status=status.HTTP_204_NO_CONTENT)
